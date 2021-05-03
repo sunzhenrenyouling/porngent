@@ -1,0 +1,199 @@
+# ykuh
+$metkaM = $ARGS[0]
+$locM = $CURLOC
+$metka = $ARGS[0]
+$loc = $CURLOC
+clr
+gs 'stat'
+'<center><b><font color="maroon">Mansion</font></b></center>'
+'<center>Kitchen</center>'
+
+if ymanrem[6] = 0:'<center><img src="images/etogame/ynill.jpg"></center>'
+if ymanrem[6] = 1:'<center><img src="images/etogame/yrem.jpg"></center>'
+if ymanrem[6] = 2:'<center><img src="images/etogame/ykun.jpg"></center>'
+if ymanrem[6] = 2:''
+
+if dirttarelka > 0 and fairy >= dirttarelka:
+	cltarelka += dirttarelka
+	fairy -= dirttarelka
+	dirttarelka = 0
+	'Dishwasher washed your dirty dishes.'
+elseif fairy < dirttarelka:
+	'Tou have no more dishwashing detergent.'
+end
+
+if cltarelka > 0:
+	'In the cabinet you have <b><<cltarelka>></b> clean plates'
+else
+	'<b><font color="red">You don''t have any clean plates left.</font></b>'
+end
+
+if dirttarelka > 0:'In the sink are <b><<dirttarelka>></b> dirty dishes. <a href="exec:dynamic $dirtarm">Wash the dishes</a>.'
+
+if fairy > 0:
+	'Under the sink is some dishwashing detergent, which is enough for <b><<fairy>></b> times.'
+else
+	'<b><font color="red">You have nothing to wash dishes with. You should buy some dishwashing detergent.</font></b>'
+end
+
+if eda > 0:
+	if cltarelka = 0 or edahot > 0:$edagot = ''
+	if cltarelka > 0 and edahot = 0:$edagot = '<a href="exec:dynamic $edagotd">Cook meal (0:30)</a>'
+
+	'In the refrigerator is enough food for <b><<eda>></b> servings. <<$edagot>>'
+elseif edaD = 0 and eda = 0:
+	'<b><font color="red">The fridge is empty, you have nothing to eat.</font></b>'
+end
+
+act 'Leave the room':minut += 1 & gt 'ymans'
+
+if edahot > 0:'<a href="exec:dynamic $edahotd">On the table is a cooked meal.</a>'
+
+if pranik > 0:
+	'You have <<pranik>> cookies.'
+	act 'Drink tea with cookies (0:05)':
+		cla
+		*clr
+		minut += 5
+		pranik -= 1
+		health += 30
+		manna += 100
+		energy += 20
+		water += 20
+		fat += 50
+		frost = 0
+		gs 'stat'
+		'<center><img src="images/pics/food.jpg"></center>'
+		'You drank tea with cookies, sweet and very bad for your figure, but so good.'
+
+		act 'Get up from the table':gt $curloc
+	end
+end
+
+if edaD > 0:
+	'In the refrigerator is some healthy meals that''s good for <b><<edaD>></b> servings.'
+
+	act 'Cook some dietary food (0:30)':
+		cla
+		*clr
+		frost = 0
+		minut += 30
+		health += 10
+		manna += 20
+		edaD -= 1
+		'<center><img src="images/pics/food.jpg"></center>'
+
+		if energy >= 30:
+			'You can no longer eat.'
+		elseif energy >= 20 and energy < 30:
+			energy += 10
+			'You are not hungry but you ate it anyway.'
+		elseif energy < 20:
+			energy += 20
+			'You gladly ate some cooked food.'
+		end
+
+		if water >= 20:
+			'You don''t want to drink anymore.'
+		elseif water < 20:
+			water += 20
+			'You gladly drank a mug of tea.'
+		end
+
+		act 'Get up from the table':gt $curloc
+	end
+end
+
+if fatdel > 0:
+	act 'Consume fat burners':
+		cla
+		*clr
+		fatdel -= 1
+		fat -= 25
+
+		if fat < 0:fat = 0
+
+		'You drank fat burning capsule. These capsules operate gradually and results will not be seen immediately.'
+
+		act 'Get up from the table':gt $curloc
+	end
+end
+
+act 'Drink':
+	cla
+	minut += 5
+
+	if water >= 20:
+		'You are not thirsty.'
+	elseif water < 20:
+		water += 20
+		'You gladly drank a glass of water.'
+	end
+
+	act 'Get up from the table':gt $curloc
+end
+
+if husband > 0 and husbanday > 0 and huseatday ! day and eda >= 2:
+	act 'Cook a meal for your husband, 2 servings (1:00)':
+		cla
+		*clr
+		husband += 5
+		eda -= 2
+		minut += 60
+		huseatday = day
+		manna -= 25
+		'<center><img src="images/pics/cook.jpg"></center>'
+		'You cooked some food for your husband.'
+
+		act 'Put the food on the table':gt $curloc
+	end
+end
+
+if lekarstvo > 0:
+	'You have <<lekarstvo>> tablets.'
+
+	if sick > 0 and lekarday ! day:
+		act 'Take a pill':
+			cla
+			*clr
+			minut += 5
+			lekarday = day
+			lekarstvo -= 1
+			sick -= sick * 20 / 100
+			lekrand = rand(1, 9)
+			'<center><img src="images/inBed/lekr1.jpg"></center>'
+			'You took the pill'
+
+			act 'Move away':gt $curloc
+		end
+	end
+end
+
+if vitamin > 0:
+	'You have <<vitamin>> vitamins.'
+
+	if vitaminday ! day:
+		act 'Take some vitamins':
+			cla
+			*clr
+			minut += 5
+			vitaminday = day
+			vitamin -= 1
+			frost = 0
+
+			if KandidozOnce = 1:Kandidoz -= 2
+			if GerpesOnce = 1:Gerpes -= 2
+			if SifacOnce = 1 and Sifilis >= 10:Sifilis -= rand(0, 1)
+
+			skinvan += 1
+
+			if skinvan = 20:skinvan = 0 & skin += 1
+
+			'You took vitamins'
+
+			act 'Move away':gt $curloc
+		end
+	end
+end
+
+--- ykuh ---------------------------------
